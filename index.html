@@ -70,7 +70,6 @@
     <p>&copy; 2025 Created by <strong>Achraf Mukhtar</strong></p>
   </div>
 
-  <script src="https://kit.fontawesome.com/a076d05399.js"></script> <!-- FontAwesome for social media icons -->
   <script>
     function calculateForecast() {
       const adSpend = parseFloat(document.getElementById('adSpend').value);
@@ -107,19 +106,32 @@
       const revenue = aov * actualCustomers;
       const roas = revenue / adSpend;
 
-      const totalCostPerOrder = productCost + extraFees;
-      const breakEvenRoas = (cac + fixedCosts) / totalCostPerOrder;
+      // Fixed costs per order
+      const fixedCostsPerOrder = fixedCosts / actualCustomers;
 
-      const netProfit = revenue - (totalCostPerOrder * actualCustomers) - adSpend - fixedCosts;
+      // Total cost per order (without CAC)
+      const totalCostPerOrder = productCost + extraFees + fixedCostsPerOrder;
 
-      const goalProfitPerOrder = aov - totalCostPerOrder - cac;
-      const goalAchieved = goalProfitPerOrder >= profitTarget ? '✅ Yes' : '❌ No';
+      // Break-even ROAS (the correct way)
+      let breakEvenRoas;
+      if (aov > totalCostPerOrder) {
+        breakEvenRoas = aov / (aov - totalCostPerOrder);
+      } else {
+        breakEvenRoas = "∞ (No break-even possible)";
+      }
+
+      // Net profit
+      const netProfit = revenue - (productCost + extraFees) * actualCustomers - adSpend - fixedCosts;
+
+      // Profit goal check (if you want to include profit target in break-even, use aov - (totalCostPerOrder + profitTarget))
+      // For now, just check if net profit is >= profitTarget * actualCustomers
+      const goalAchieved = netProfit >= profitTarget * actualCustomers ? '✅ Yes' : '❌ No';
 
       document.getElementById('expectedCustomers').textContent = expectedCustomers.toFixed(0);
       document.getElementById('actualCustomers').textContent = actualCustomers.toFixed(0);
       document.getElementById('cacResult').textContent = cac.toFixed(2);
       document.getElementById('roasResult').textContent = roas.toFixed(2);
-      document.getElementById('breakEvenRoas').textContent = breakEvenRoas.toFixed(2);
+      document.getElementById('breakEvenRoas').textContent = typeof breakEvenRoas === 'string' ? breakEvenRoas : breakEvenRoas.toFixed(2);
       document.getElementById('netProfit').textContent = netProfit.toFixed(2);
       document.getElementById('goalAchieved').textContent = goalAchieved;
       document.getElementById('results').style.display = 'block';
