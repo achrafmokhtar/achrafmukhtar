@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CAC & ROAS Calculator</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Navbar -->
+  <div class="navbar">
+    <span class="menu-icon" onclick="toggleMenu()">&#9776;</span>
+    <a href="index.html">Forecasting</a>
+    <a href="page2.html">Target CAC & ROAS</a>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="index.html">Forecasting</a>
+    <a href="page2.html">Target CAC & ROAS</a>
+  </div>
+
+  <div class="container">
+    <h2>Target CAC & ROAS Calculator</h2>
+    <p class="description">Know exactly how much you can spend to acquire a customer while staying profitable. Instantly calculate your CAC, ROAS, and break-even ROAS.</p>
+
+    <form id="calc-form">
+      <label>Average Order Value (AOV) $</label>
+      <input type="number" id="aov" step="0.01" required />
+
+      <label>Cost of Goods Sold (COGS) $</label>
+      <input type="number" id="cogs" step="0.01" required />
+
+      <label>Shipping Cost $</label>
+      <input type="number" id="shipping" step="0.01" required />
+
+      <label>Transaction Fees %</label>
+      <input type="number" id="fees" step="0.01" required />
+
+      <label>Other Variable Costs % of Revenue</label>
+      <input type="number" id="variableCosts" step="0.01" required />
+
+      <label>Ad Spend $</label>
+      <input type="number" id="adSpend" step="0.01" required />
+
+      <label>Number of Customers</label>
+      <input type="number" id="customers" required />
+
+      <label>Return Rate % (e.g., 10 for 10%)</label>
+      <input type="number" id="returnRate" step="0.01" required />
+
+      <button type="submit">Calculate</button>
+    </form>
+
+    <div class="results" id="results" style="display: none">
+      <p><strong>Adjusted CAC:</strong> $<span id="cac"></span></p>
+      <p><strong>Actual ROAS:</strong> <span id="roas"></span>x</p>
+      <p><strong>Break-even ROAS:</strong> <span id="breakevenRoas"></span>x</p>
+      <p><em>This is the minimum ROAS needed to avoid losing money.</em></p>
+    </div>
+  </div>
+
+  <div class="copyright">
+    <p>&copy; 2025 Created by <strong>Achraf Mukhtar</strong></p>
+  </div>
+
+  <script>
+    document.getElementById("calc-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const aov = parseFloat(document.getElementById("aov").value);
+      const cogs = parseFloat(document.getElementById("cogs").value);
+      const shipping = parseFloat(document.getElementById("shipping").value);
+      const fees = parseFloat(document.getElementById("fees").value);
+      const variableCosts = parseFloat(document.getElementById("variableCosts").value);
+      const adSpend = parseFloat(document.getElementById("adSpend").value);
+      const customers = parseInt(document.getElementById("customers").value);
+      const returnRate = parseFloat(document.getElementById("returnRate").value) / 100;
+
+      const netCustomers = customers * (1 - returnRate);
+      const cac = adSpend / netCustomers;
+      const roas = (aov * netCustomers) / adSpend;
+
+      const costPercent = (cogs + shipping) / aov;
+      const percentFees = fees / 100;
+      const percentVariable = variableCosts / 100;
+      const totalCostPercentage = costPercent + percentFees + percentVariable;
+      const breakevenRoas = 1 / (1 - totalCostPercentage);
+
+      document.getElementById("cac").innerText = cac.toFixed(2);
+      document.getElementById("roas").innerText = roas.toFixed(2);
+      document.getElementById("breakevenRoas").innerText = breakevenRoas.toFixed(2);
+      document.getElementById("results").style.display = "block";
+    });
+
+    function toggleMenu() {
+      const mobileMenu = document.getElementById('mobileMenu');
+      mobileMenu.style.display = mobileMenu.style.display === 'flex' ? 'none' : 'flex';
+    }
+  </script>
+</body>
+</html>
