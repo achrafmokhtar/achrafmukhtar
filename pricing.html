@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Product Pricing Calculator (with Break-even CPP)</title>
+  <link rel="stylesheet" href="styles.css">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 520px;
+      margin: 3em auto;
+      padding: 2em;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 1em;
+    }
+
+    label {
+      display: block;
+      margin: 1em 0 0.2em;
+      font-weight: bold;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 0.7em;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 1em;
+      margin-bottom: 0.2em;
+    }
+
+    small {
+      color: #666;
+      display: block;
+      margin-bottom: 1em;
+      font-size: 0.92em;
+    }
+
+    button {
+      width: 100%;
+      padding: 1em;
+      background: #4CAF50;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 1em;
+      cursor: pointer;
+      margin-top: 1em;
+    }
+
+    .results {
+      margin-top: 2em;
+      padding: 1em;
+      background: #f0f8ff;
+      border-radius: 4px;
+    }
+
+    .result-item {
+      margin: 0.5em 0;
+    }
+
+    .copyright {
+      text-align: center;
+      margin: 2em 0 0 0;
+      color: #888;
+      font-size: 0.95em;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Navbar -->
+  <div class="navbar">
+    <span class="menu-icon" onclick="toggleMenu()">&#9776;</span>
+    <a href="index.html">Forecasting</a>
+    <a href="page2.html">Target CAC & ROAS</a>
+    <a href="pricing.html">Pricing</a>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="index.html">Forecasting</a>
+    <a href="page2.html">Target CAC & ROAS</a>
+    <a href="pricing.html">pricing</a>
+
+  </div>
+
+  <div class="container">
+    <h2>Product Pricing Calculator<br>(with Break-even CPP)</h2>
+    <form id="pricingForm">
+      <label for="cost">Product Cost (COGS) $</label>
+      <input type="number" id="cost" step="0.01" required />
+      <small>Cost to produce or purchase the product (per unit)</small>
+
+      <label for="shipping">Shipping Cost $</label>
+      <input type="number" id="shipping" step="0.01" required />
+      <small>Shipping cost per unit</small>
+
+      <label for="fees">Transaction Fees %</label>
+      <input type="number" id="fees" step="0.01" required />
+      <small>Payment gateway or marketplace fee (as a percentage of price)</small>
+
+      <label for="other">Other Variable Costs $</label>
+      <input type="number" id="other" step="0.01" required />
+      <small>Packaging, storage, or any other per-unit costs</small>
+
+      <label for="fixed">Fixed Costs $</label>
+      <input type="number" id="fixed" step="0.01" required />
+      <small>Total fixed costs (e.g., rent, salaries) for the period</small>
+
+      <label for="units">Estimated Units Sold</label>
+      <input type="number" id="units" required />
+      <small>How many units you expect to sell in the period</small>
+
+      <label for="adspend">Ad Spend $</label>
+      <input type="number" id="adspend" step="0.01" required />
+      <small>Total advertising spend for the period</small>
+
+      <label for="profit">Desired Profit per Unit $</label>
+      <input type="number" id="profit" step="0.01" required />
+      <small>How much profit you want to make per unit sold</small>
+
+      <label for="sellprice">Planned Selling Price $</label>
+      <input type="number" id="sellprice" step="0.01" required />
+      <small>The price you plan to sell each unit for (used for break-even orders and break-even CPP)</small>
+
+      <button type="submit">Calculate</button>
+    </form>
+
+    <div class="results" id="results" style="display:none">
+      <div class="result-item"><strong>Minimum Selling Price per Unit:</strong> $<span id="price"></span></div>
+      <div class="result-item"><strong>Profit per Unit:</strong> $<span id="profitUnit"></span></div>
+      <div class="result-item"><strong>Total Net Profit:</strong> $<span id="netProfit"></span></div>
+      <div class="result-item"><strong>Ad Spend per Purchase (CPP):</strong> $<span id="cpp"></span></div>
+      <div class="result-item"><strong>Break-even Price (no profit):</strong> $<span id="breakEven"></span></div>
+      <div class="result-item"><strong>Break-even Orders:</strong> <span id="breakevenOrders"></span></div>
+      <div class="result-item"><strong>Break-even CPP (max ad spend per purchase):</strong> $<span
+          id="breakevenCpp"></span></div>
+      <div class="result-item"><em>Break-even CPP is the maximum ad spend per purchase you can afford at your planned
+          selling price to avoid losses.</em></div>
+    </div>
+  </div>
+  <div class="copyright">
+    &copy; 2025 Product Pricing Tool by <strong>Achraf Mukhtar</strong>
+  </div>
+  <script>
+    document.getElementById('pricingForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const cost = parseFloat(document.getElementById('cost').value);
+      const shipping = parseFloat(document.getElementById('shipping').value);
+      const fees = parseFloat(document.getElementById('fees').value) / 100;
+      const other = parseFloat(document.getElementById('other').value);
+      const fixed = parseFloat(document.getElementById('fixed').value);
+      const units = parseFloat(document.getElementById('units').value);
+      const adspend = parseFloat(document.getElementById('adspend').value);
+      const profitTarget = parseFloat(document.getElementById('profit').value);
+      const sellprice = parseFloat(document.getElementById('sellprice').value);
+
+      if (
+        cost < 0 || shipping < 0 || fees < 0 || other < 0 ||
+        fixed < 0 || units <= 0 || adspend < 0 || profitTarget < 0 || sellprice <= 0
+      ) {
+        alert('Please enter valid, positive numbers for all fields.');
+        return;
+      }
+
+      // Per-unit fixed cost
+      const fixedPerUnit = fixed / units;
+      // Per-unit ad spend (CPP)
+      const cpp = adspend / units;
+      // Total variable cost per unit (excluding transaction fees and profit)
+      const baseCost = cost + shipping + other + fixedPerUnit + cpp;
+      // Minimum price calculation (covers all costs, fees, and profit)
+      // price = (baseCost + profitTarget) / (1 - fees)
+      const price = (baseCost + profitTarget) / (1 - fees);
+      // Break-even price (no profit)
+      const breakEven = baseCost / (1 - fees);
+      // Profit per unit at this price
+      const profitPerUnit = price - baseCost - (price * fees);
+      // Total net profit
+      const netProfit = profitPerUnit * units;
+
+      // Break-even orders calculation
+      // Variable cost per unit for break-even: all variable costs including ad spend per order, fixed cost per order (optional)
+      const variableCostForBreakEven = cost + shipping + other + cpp + (sellprice * fees);
+      // Fixed costs for break-even: fixed + ad spend (if you treat ad spend as fixed for the period)
+      const breakEvenOrders = Math.ceil(
+        (fixed + adspend) / (sellprice - variableCostForBreakEven)
+      );
+
+      // Break-even CPP (max ad spend per purchase you can afford at your planned selling price)
+      // breakEvenCpp = sellprice - (cost + shipping + other + fixedPerUnit + sellprice * fees)
+      const breakEvenCpp = sellprice - (cost + shipping + other + fixedPerUnit + sellprice * fees);
+
+      document.getElementById('price').textContent = price.toFixed(2);
+      document.getElementById('profitUnit').textContent = profitPerUnit.toFixed(2);
+      document.getElementById('netProfit').textContent = netProfit.toFixed(2);
+      document.getElementById('cpp').textContent = cpp.toFixed(2);
+      document.getElementById('breakEven').textContent = breakEven.toFixed(2);
+      document.getElementById('breakevenOrders').textContent = isFinite(breakEvenOrders) && breakEvenOrders > 0 ? breakEvenOrders : "N/A";
+      document.getElementById('breakevenCpp').textContent = breakEvenCpp > 0 && isFinite(breakEvenCpp) ? breakEvenCpp.toFixed(2) : "N/A";
+      document.getElementById('results').style.display = 'block';
+    });
+  </script>
+</body>
+
+</html>
