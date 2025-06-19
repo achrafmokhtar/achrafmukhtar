@@ -103,8 +103,10 @@ button:hover {
 .menu-icon {
   display: none;
   font-size: 28px;
-  color: white;
+  color: var(--primary-color);
   cursor: pointer;
+  padding: 10px;
+  text-align: right;
 }
 
 .mobile-menu {
@@ -133,8 +135,7 @@ button:hover {
   text-align: center;
   padding: 15px 10px;
   font-size: 14px;
-  margin-top: 30px; /* Ensure there's enough space from the content */
-  position: relative;
+  margin-top: 30px;
   width: 100%;
 }
 
